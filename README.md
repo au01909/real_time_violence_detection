@@ -6,17 +6,12 @@ pip install -r requirements.txt
 ```
 Note: It will be better if you create a virtual environment for this to avoid conflicts
 ### Step 1: Create your dataset
-There are 2 files to create your custom dataset (Pose and Hands), named as `pose_data_generation.py` and `hands_data_generation.py`, choose one based on your need, and then you'll need to mofidy the parameters inside the script, details as below:
+There are files to create your custom dataset (Pose), named as `pose_data_generation.py`, choose based on your need, and then you'll need to mofidy the parameters inside the script, details as below:
 - Change the image strem index (line 5) according to your device, if you are using a webcam from your laptop, leave it at 0 or 1, if you are using an external USB, you will have to change it according to the index of your device.
 - Change the label name (line 12), change it to the label of your dataset, for example, if you're about to train a dataset of push-ups, then change it to `label = "push-ups"`
 - Change the number of frame/data you want to train (line 13), currently it is at 1000, sufficient for a small model, if you aim for a more precise model, I'd recommend to increase it to 2000 - 5000
-- For `hand_data_generation.py` you can determine how many hands you want to capture the motion (line 8), replace max_num_hands to 2 if you want to capture both hands, leave it at 1 and you'll capture the first hand detected.
 
 Then run the script with:
-```
-python3 hand_data_generation.py
-```
-or
 ```
 python3 pose_data_generation.py
 ```
@@ -72,7 +67,7 @@ Note: It suppose to take a while depending on the size of your datasets.
 Congratulations on getting to this step, you're almost finish, this step will involve you to runinng a real time demonstration with the model you trained.  
 There will be 2 files depending on your application (Pose and Hands), choose the one that match with what you've been training the model for, they're named as `pose_lstm_realtime.py` and `hand_lstm_realtime.py`. Below will be a few things you'll need to adjust before executing the script.  
 - Change the default parameter (line 41), default parameter is the parameter that will be initialized at first, change it to one of your dataset's label.
-- Change the neutral label (line 42), the term `neutral_label` in here refer to a dataset that is neutral, for example in the `hand_lstm_realtime.py` script, the neutral state in here is when the hand has not grasped an object, and in `pose_lstm_realtime.py` the neutral state in here is the person not performing any violent act. In short, this is not very important at all, but it's the way that I'm developing this application is to separate an action from another action. For example with the 3 actions we have above: push-ups, plank and burpee, we select plank as our neutral_label, then every time a person is detected as doing plank, the box will be in red and the label will be in red as well, but the detection results doesn't matter.
+- Change the neutral label (line 42), the term `neutral_label` in here refer to a dataset that is neutral, for example in `pose_lstm_realtime.py` the neutral state in here is the person not performing any violent act. In short, this is not very important at all, but it's the way that I'm developing this application is to separate an action from another action. For example with the 3 actions we have above: push-ups, plank and burpee, we select plank as our neutral_label, then every time a person is detected as doing plank, the box will be in red and the label will be in red as well, but the detection results doesn't matter.
 - detect function: this is the most important function in this script, it select the highest prediction from the list of trained dataset and give the results, you'll need to modify this function to adapt to your application, the detect function looks like this:
 ```
 def detect(model, lm_list):
@@ -110,15 +105,8 @@ Once you go through all of the modifications, you're ready to go, execute the sc
 ```
 python3 pose_lstm_realtime.py
 ```
-or
-```
-python3 hand_lstm_realtime.py
-```
 Optional: You can customize the label, bounding boxes, etc ... with matplotlib to make the detection looks cooler, more sci-fi.  
-
-Troubleshooting: If you have a Sequential-related error, it's very likely that your trained dataset shape and the realtime dataset have different size, for example, you could be training a hands datasets with both hands but when you're doing detection there is only 1 hand, or vice versa. Make sure the size of the dataset and the realtime data matched.
 
 ### Demo video:
 
 1. LSTM Pose (Violent Detection): https://youtu.be/Rnu7qdCSr9Q
-2. LSTM Hand (Grasp Object): https://youtu.be/ri4uk30wS0A
